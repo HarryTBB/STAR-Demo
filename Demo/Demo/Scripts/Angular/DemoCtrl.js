@@ -19,6 +19,7 @@ angular.module("myApplication", ["smart-table"]).controller('safeCtrl', ['$scope
     $scope.user = {};
     $scope.updateUser = {};
     $scope.deleteID = 0;
+    $scope.dateFormat = "";
     $scope.loadData = function () {
         $scope.rowCollection = [];
         $http({
@@ -26,7 +27,7 @@ angular.module("myApplication", ["smart-table"]).controller('safeCtrl', ['$scope
             url: '/api/PeopleAPI'
         }).then(function success(response) {
             $scope.rowCollection = response.data;
-            console.log(response);
+            console.log(response.data);
         }, function error(response) {
 
         });
@@ -42,13 +43,13 @@ angular.module("myApplication", ["smart-table"]).controller('safeCtrl', ['$scope
         $('#modalUpdate').modal('show');
         $scope.updateID = ID;
         $scope.updateUser = row;
+        $scope.dateFormat = new Date(JSON.stringify(row.DOB).substring(1, 11));
         console.log($scope.updateUser);
     }
 
     $scope.create = function () {
         $scope.createCopy = angular.copy($scope.user);
         console.log($scope.user)
-
         $http({
             method: 'POST',
             url: '/api/PeopleAPI',
@@ -68,7 +69,8 @@ angular.module("myApplication", ["smart-table"]).controller('safeCtrl', ['$scope
 
 
     $scope.update = function () {
-        $scope.updateCopy = angular.copy($scope.updateUser);
+        $scope.updateUser.DOB = $scope.dateFormat;
+        $scope.updateCopy = $scope.updateUser;
         console.log($scope.updateUser)
         $http({
             method: 'PUT',
