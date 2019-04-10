@@ -1,0 +1,193 @@
+﻿@model IEnumerable<Demo.Person>
+
+@{
+    ViewBag.Title = "People Index";
+}
+<script src="~/Scripts/angular.js"></script>
+<script src="~/Scripts/smart-table.js"></script>
+<div ng-app="myApplication" ng-controller="safeCtrl">
+
+
+
+    <h2 ng-init="loadData()">People</h2>
+
+    <p>
+        <button type="button" class="btn btn-info btn-lg"
+                data-toggle="modal" data-target="#modalCreate">
+            Create New
+        </button>
+    </p>
+
+    <!--Modal: modalCreate-->
+    <div id="modalCreate" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Create New</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="api/PeopleAPI" method="POST" name="createData">
+                        Name: <br />
+                        <input type="text" ng-model="user.Name" style="width:200px"><br />
+                        Sex:  <br />
+                        <select name="sex" style="width:200px">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select><br />
+                        DOB:  <br />
+                        <input type="date" ng-model="user.DOB" style="width:200px"><br />
+                        Address:  <br />
+                        <input type="text" ng-model="user.Address" style="width:200px"><br />
+                        Money: <br />
+                        <input type="number" ng-model="user.Money" style="width:200px">
+                    </form>
+                    @*<pre>user = {{user | json}}</pre>
+                        <pre>master = {{master | json}}</pre>*@
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="create()">Create</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <table st-table="displayCollection" st-safe-src="rowCollection" class="table table-striped">
+        <thead>
+            <tr>
+                <th st-sort="PersonID">ID</th>
+                <th st-sort="Name">Name</th>
+                <th st-sort="Sex">Sex</th>
+                <th st-sort="DOB">DOB</th>
+                <th>Address</th>
+                <th st-sort="Money">Money</th>
+                <th></th>
+                <th></th>
+            </tr>
+            <tr>
+                <th>
+                    <input st-search="PersonID" placeholder="search for ID" class="input-sm form-control" type="search" />
+                </th>
+                <th>
+                    <input st-search="Name" placeholder="search for name" class="input-sm form-control" type="search" />
+                </th>
+                <th>
+                    <input st-search="Sex" placeholder="search for name" class="input-sm form-control" type="search" />
+                </th>
+                <th>
+                    <input st-search="DOB" placeholder="search for name" class="input-sm form-control" type="search" />
+                </th>
+                <th>
+                    <input st-search="Address" placeholder="search for name" class="input-sm form-control" type="search" />
+                </th>
+                <th>
+                    <input st-search="Money" placeholder="search for name" class="input-sm form-control" type="search" />
+                </th>
+
+
+
+                @*<th>
+            <select st-search="Sex">
+                <option value="">All</option>
+                <option value="Male">MAle</option>
+            </select>
+        </th>*@
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="row in displayCollection">
+                <td>{{row.PersonID}}</td>
+                <td>{{row.Name}}</td>
+                <td>{{row.Sex}}</td>
+                <td>{{row.DOB | date}}</td>
+                <td>{{row.Address}}</td>
+                <td>{{row.Money | currency}}</td>
+                <td>
+                    <button type="button" class="btn btn-primary" ng-click="openUpdateModal(row.PersonID, row)">
+                        Edit
+                    </button>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-primary" ng-click="openDeleteModal(row.PersonID)">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <!--Modal: modalUpdate-->
+    <div id="modalUpdate" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Update Details</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="api/PeopleAPI" method="PUT" name="updateData">
+                        ID: <span>{{updateUser.PersonID}}</span><br />
+                        Name: <br />
+                        <input type="text" ng-model="updateUser.Name" style="width:200px"  > <br />
+                        Sex:  <br />
+                        <select name="sex" style="width:200px">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select><br />
+                        DOB:  <br />
+                        <input type="datetime" ng-model="updateUser.DOB | date:'MM/dd/yyyy'" style="width:200px"><br />
+                        Address:  <br />
+                        <input type="text" ng-model="updateUser.Address" style="width:200px"><br />
+                        Money: <br />
+                        <input type="number" ng-model="updateUser.Money" style="width:200px">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="update()">Update</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+
+    <!--Modal: modalConfirmDelete-->
+    <div class="modal fade" id="modalConfirmDelete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-notify modal-danger" role="document">
+            <!--Content-->
+            <div class="modal-content text-center">
+
+                <!--Body-->
+                <div class="modal-body">
+                    <p>Are you sure?</p>
+                    <i class="fas fa-times fa-4x animated rotateIn"></i>
+
+                </div>
+                <!--Footer-->
+                <div class="modal-footer flex-center">
+                    <button type="button" class="btn  btn-outline-danger" ng-click="delete()">Yes</button>
+                    <button type="button" class="btn  btn-danger waves-effect" data-dismiss="modal">No</button>
+                </div>
+            </div>
+            <!--/.Content-->
+        </div>
+    </div>
+    <!--Modal: modalConfirmDelete-->
+
+
+
+</div>
+
+<script src="~/Scripts/Angular/DemoCtrl.js"></script>
