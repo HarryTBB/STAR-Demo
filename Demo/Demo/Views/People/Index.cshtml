@@ -5,6 +5,8 @@
 }
 <script src="~/Scripts/angular.js"></script>
 <script src="~/Scripts/smart-table.js"></script>
+<script src="~/Scripts/validate.min.js"></script>
+<script src="~/Scripts/moment.min.js"></script>
 <div ng-app="myApplication" ng-controller="safeCtrl">
 
 
@@ -31,18 +33,23 @@
                 <div class="modal-body">
                     <form action="api/PeopleAPI" method="POST" name="createData">
                         Name: <br />
-                        <input type="text" ng-model="user.Name" style="width:200px"><br />
+                        <input name="createName"type="text" ng-model="user.Name" ng-blur="errorList(user)" style="width:200px"><br />
+                        <p ng-show="createData.createName.$touched || clicked">{{nameError}}</p>
+                            
                         Sex:  <br />
-                        <select name="sex" style="width:200px">
+                        <select ng-blur="errorList(user)" style="width:200px">
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
                         </select><br />
                         DOB:  <br />
-                        <input type="date" ng-model="user.DOB" style="width:200px"><br />
+                        <input name="createDOB" type="date" ng-model="user.DOB" ng-blur="errorList(user)" style="width:200px"><br />
+                        <p ng-show="createData.createDOB.$touched || clicked">{{DOBError}}</p>
                         Address:  <br />
-                        <input type="text" ng-model="user.Address" style="width:200px"><br />
+                        <input name="createAddress"type="text" ng-model="user.Address" ng-blur="errorList(user)" style="width:200px"><br />
+                        <p ng-show="createData.createAddress.$touched || clicked">{{addressError}}</p>
                         Money: <br />
-                        <input type="number" ng-model="user.Money" style="width:200px">
+                        <input name="createMoney" type="number" ng-model="user.Money" ng-blur="errorList(user)" style="width:200px">
+                        <p ng-show="createData.createMoney.$touched || clicked">{{moneyError}}</p>
                     </form>
                     @*<pre>user = {{user | json}}</pre>
                         <pre>master = {{master | json}}</pre>*@
@@ -91,11 +98,11 @@
 
 
                 @*<th>
-            <select st-search="Sex">
-                <option value="">All</option>
-                <option value="Male">MAle</option>
-            </select>
-        </th>*@
+                        <select st-search="Sex">
+                            <option value="">All</option>
+                            <option value="Male">MAle</option>
+                        </select>
+                    </th>*@
             </tr>
         </thead>
         <tbody>
@@ -135,18 +142,22 @@
                     <form action="api/PeopleAPI" method="PUT" name="updateData">
                         ID: <span>{{updateUser.PersonID}}</span><br />
                         Name: <br />
-                        <input type="text" ng-model="updateUser.Name" style="width:200px"  > <br />
+                        <input name ="updateName" type="text" ng-model="updateUser.Name" ng-blur="errorList(updateUser)" style="width:200px"> <br />
+                        <p>{{nameError}}</p>
                         Sex:  <br />
                         <select name="sex" style="width:200px">
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
                         </select><br />
                         DOB:  <br />
-                        <input type="date" ng-model="dateFormat" style="width:200px"><br />
+                        <input type="date" ng-model="dateFormat" ng-blur="errorList(updateUser)" style="width:200px"><br />
+                        <p>{{DOBError}}</p>
                         Address:  <br />
-                        <input type="text" ng-model="updateUser.Address" style="width:200px"><br />
+                        <input type="text" ng-model="updateUser.Address" ng-blur="errorList(updateUser)" style="width:200px"><br />
+                        <p>{{addressError}}</p>
                         Money: <br />
-                        <input type="number" ng-model="updateUser.Money" style="width:200px">
+                        <input type="number" ng-model="updateUser.Money" ng-blur="errorList(updateUser)" style="width:200px">
+                        <p>{{moneyError}}</p>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -191,3 +202,17 @@
 </div>
 
 <script src="~/Scripts/Angular/DemoCtrl.js"></script>
+
+<script>
+    (function () {
+        validate.extend(validate.validators.datetime, {
+            parse: function (value, options) {
+                return +moment.utc(value);
+            },
+            format: function (value, options) {
+                var format = options.dateOnly ? "YYYY-MM-DD" : "YYYY-MM-DD hh:mm:ss";
+                return moment.utc(value).format(format);
+            }
+        });
+    })();
+</script>
